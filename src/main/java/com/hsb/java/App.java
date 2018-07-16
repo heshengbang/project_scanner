@@ -6,8 +6,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,12 +44,7 @@ public class App {
 
     private static void showStatisticsData(HashMap<String, Integer> data) {
         List<Map.Entry<String, Integer>> annotationLists = new ArrayList<>(data.entrySet());
-        Collections.sort(annotationLists, new Comparator<Map.Entry<String, Integer>>() {
-            @Override
-            public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
-                return o2.getValue().compareTo(o1.getValue());
-            }
-        });
+        annotationLists.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
         for (Map.Entry<String, Integer> entry : annotationLists) {
             System.out.println(fillWithBlank(entry.getKey(), entry.getValue()));
         }
