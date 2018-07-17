@@ -45,17 +45,6 @@ public class App {
 
     private static void outputToConsoleAndLocal() {
         StringBuilder sb = new StringBuilder();
-        String annotationIllustration = "-------------------- Annotations Used Statistics --------------------";
-        System.out.println(annotationIllustration);
-        sb.append(annotationIllustration).append(Constants.NEWLINE);
-
-        String annotationStatistics = "Totally " + annotationsData.size() + " annotations be used";
-        System.out.println(annotationStatistics);
-        sb.append(annotationStatistics).append(Constants.NEWLINE);
-
-        showStatisticsData(annotationsData, sb);
-        sb.append(annotationStatistics).append(Constants.NEWLINE);
-
 
         String classesIllustration = "-------------------- Classes Used Statistics ----------------------";
         System.out.println(classesIllustration);
@@ -65,8 +54,20 @@ public class App {
         System.out.println(classesStatistics);
         sb.append(classesStatistics).append(Constants.NEWLINE);
 
-        showStatisticsData(classImportedData, sb);
+        showStatisticsData(classImportedData, sb, 100);
+        sb.append(Constants.NEWLINE);
+
+
+        String annotationIllustration = "-------------------- Annotations Used Statistics --------------------";
+        System.out.println(annotationIllustration);
+        sb.append(annotationIllustration).append(Constants.NEWLINE);
+
+        String annotationStatistics = "Totally " + annotationsData.size() + " annotations be used";
+        System.out.println(annotationStatistics);
         sb.append(annotationStatistics).append(Constants.NEWLINE);
+
+        showStatisticsData(annotationsData, sb, 50);
+        sb.append(Constants.NEWLINE);
 
 
         String keywordsIllustration = "-------------------- Keywords Used Statistics ----------------------";
@@ -77,8 +78,8 @@ public class App {
         System.out.println(keywordsStatistics);
         sb.append(keywordsStatistics).append(Constants.NEWLINE);
 
-        showStatisticsData(keywordsData, sb);
-        sb.append(annotationStatistics).append(Constants.NEWLINE);
+        showStatisticsData(keywordsData, sb, 50);
+        sb.append(Constants.NEWLINE);
 
 
         File localFile = new File("statistics.txt");
@@ -104,17 +105,17 @@ public class App {
         }
     }
 
-    private static void showStatisticsData(HashMap<String, Integer> data, StringBuilder sb) {
+    private static void showStatisticsData(HashMap<String, Integer> data, StringBuilder sb, int stringLength) {
         List<Map.Entry<String, Integer>> annotationLists = new ArrayList<>(data.entrySet());
         annotationLists.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
         for (Map.Entry<String, Integer> entry : annotationLists) {
-            String output = fillWithBlank(entry.getKey(), entry.getValue());
+            String output = fillWithBlank(entry.getKey(), entry.getValue(), stringLength);
             System.out.println(output);
             sb.append(output).append(Constants.NEWLINE);
         }
     }
 
-    private static String fillWithBlank(String key, Integer value) {
+    private static String fillWithBlank(String key, Integer value, int stringLength) {
         StringBuilder sb = new StringBuilder(key);
         int blanks = 100 - sb.length();
         for (int i = 0; i < blanks; i++) {
