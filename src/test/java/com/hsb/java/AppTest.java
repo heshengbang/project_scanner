@@ -20,25 +20,7 @@ public class AppTest {
      */
     @Test
     public void shouldAnswerWithTrue() throws IOException {
-        File file = new File("D:/develop/github/spring-boot-examples/spring-boot-web-thymeleaf/src/test/java/com/neo/MessageControllerWebTests.java");
-        StringBuilder fileContent = new StringBuilder();
-        if (file.exists() && file.isFile()) {
-            InputStreamReader inputStreamReader = new InputStreamReader(new FileInputStream(file));
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            try {
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    fileContent.append(line);
-                    fileContent.append("\n");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                bufferedReader.close();
-                inputStreamReader.close();
-            }
-        }
-//        String content = fileContent.toString();
+        String content = getFileContent();
 //        System.out.println(content);
 //        System.out.println("===================================================");
 //        System.out.println();
@@ -60,5 +42,38 @@ public class AppTest {
         while (matcher.find()) {
             System.out.println(matcher.group());
         }
+    }
+
+    @Test
+    public void classImportedTest() throws IOException {
+        String classRegex = "import +[A-Za-z0-9.]*;";
+        String content = getFileContent();
+        Pattern pattern = Pattern.compile(classRegex);
+        Matcher matcher = pattern.matcher(content);
+        while (matcher.find()) {
+            System.out.println(matcher.group());
+        }
+    }
+
+    private String getFileContent() throws IOException {
+        File file = new File("D:/develop/github/spring-boot-examples/spring-boot-web-thymeleaf/src/test/java/com/neo/MessageControllerWebTests.java");
+        StringBuilder fileContent = new StringBuilder();
+        if (file.exists() && file.isFile()) {
+            InputStreamReader inputStreamReader = new InputStreamReader(new FileInputStream(file));
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            try {
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    fileContent.append(line);
+                    fileContent.append("\n");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                bufferedReader.close();
+                inputStreamReader.close();
+            }
+        }
+        return fileContent.toString();
     }
 }

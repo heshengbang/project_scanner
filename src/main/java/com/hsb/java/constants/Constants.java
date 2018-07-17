@@ -12,4 +12,6 @@ public class Constants {
     public static String NEWLINE = "\r\n";
     public static String AT = "@";
     public static String EMPTY = "";
+    public static String IMPORT = "import";
+    public static String COLON = ";";
 }
