@@ -1,13 +1,11 @@
 package com.hsb.java.constants;
 
 /**
- * 功能描述:
- *
- * @author 何虎
- * @version 1.0
- * @time 2018/7/17 11:25
- * ************************************************
- * @since
+ * created by heshengbang
+ * 2018-07-16 16:42:00
+ * https://www.heshengbang.tech
+ * https://twitter.com/heshengbang
+ * https://github.com/heshengbang
  */
 
 public class Constants {
