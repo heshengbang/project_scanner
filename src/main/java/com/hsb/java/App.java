@@ -23,8 +23,8 @@ public class App {
     private static HashMap<String, Integer> classImportedData = new HashMap<>();
 
     public static void main(String[] args) {
-//        String path = "D:/develop/github/spring-boot-examples";
-         String path = args[0];
+        String path = "D:/develop/github/spring-boot-examples";
+//         String path = args[0];
         System.out.println("Begin to scan the path ：" + path);
 
         List<String> files = new ArrayList<>(getAllFilesPath(path));
@@ -55,7 +55,7 @@ public class App {
         System.out.println(classesStatistics);
         sb.append(classesStatistics).append(Constants.NEWLINE);
 
-        showStatisticsData(classImportedData, sb, 100);
+        showStatisticsData(classImportedData, sb, 120);
         sb.append(Constants.NEWLINE);
 
 
@@ -129,7 +129,7 @@ public class App {
 
     private static String fillWithBlank(String key, Integer value, int stringLength) {
         StringBuilder sb = new StringBuilder(key);
-        int blanks = 100 - sb.length();
+        int blanks = stringLength - sb.length();
         for (int i = 0; i < blanks; i++) {
             sb.append(" ");
         }
