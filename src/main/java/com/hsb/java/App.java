@@ -23,7 +23,7 @@ public class App {
 
     public static void main(String[] args) {
         String path = args[0];
-        System.out.println("开始扫描地址：" + path + " 路径下使用的Java类和注解");
+        System.out.println("Begin to scan the path ：" + path + " ");
 
         List<String> files = new ArrayList<>(getAllFilesPath(path));
         if (files.size() > 0) {
@@ -43,21 +43,21 @@ public class App {
 
     private static void outputToConsoleAndLocal() {
         StringBuilder sb = new StringBuilder();
-        String annotationIllustration = "--------------------注解使用统计--------------------";
+        String annotationIllustration = "--------------------Annotations Used Statistics--------------------";
         System.out.println(annotationIllustration);
         sb.append(annotationIllustration).append(Constants.NEWLINE);
 
-        String annotationStatistics = "共计使用注解 " + annotationsData.size() + " 个";
+        String annotationStatistics = "Totally use annotations " + annotationsData.size();
         System.out.println(annotationStatistics);
         sb.append(annotationStatistics).append(Constants.NEWLINE);
 
         showStatisticsData(annotationsData, sb);
 
-        String classesIllustration = "--------------------关键字使用统计----------------------";
+        String classesIllustration = "--------------------Keyword Used Statistics----------------------";
         System.out.println(classesIllustration);
         sb.append(classesIllustration).append(Constants.NEWLINE);
 
-        String classStatistics = "共计出现可能的类 " + classesData.size() + " 个";
+        String classStatistics = "Totally appeared keywords " + classesData.size();
         System.out.println(classStatistics);
         sb.append(classStatistics).append(Constants.NEWLINE);
 
