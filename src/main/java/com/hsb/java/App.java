@@ -30,8 +30,8 @@ public class App {
         outputAndAppend(sb, startInfo);
 
 
-        String path = "D:/develop/github/spring-boot-examples";
-//         String path = args[0];
+//        String path = "D:/develop/github/spring-boot-examples";
+         String path = args[0];
 
         String pathInfo = "Path 【" + path + "】 will be scanned";
         outputAndAppend(sb, pathInfo);
