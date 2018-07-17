@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class App {
     private static HashMap<String, Integer> keywordsData = new HashMap<>();
@@ -23,35 +24,69 @@ public class App {
     private static HashMap<String, Integer> classImportedData = new HashMap<>();
 
     public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder();
+
+        String startInfo = "============================================= SCANNING START =================================================";
+        outputAndAppend(sb, startInfo);
+
+
         String path = "D:/develop/github/spring-boot-examples";
 //         String path = args[0];
-        System.out.println("Begin to scan the path ：" + path);
+
+        String pathInfo = "Path 【" + path + "】 will be scanned";
+        outputAndAppend(sb, pathInfo);
 
         List<String> files = new ArrayList<>(getAllFilesPath(path));
+
+        files = files.stream().filter(file -> file.endsWith(".java") || file.endsWith(".xml")).collect(Collectors.toList());
+
+        String countInfo = "A total of " + files.size() + " files were scanned";
+        outputAndAppend(sb, countInfo);
+
         if (files.size() > 0) {
             for (String filePath : files) {
-                if (filePath != null && (filePath.endsWith(".java") || filePath.endsWith(".xml"))) {
-                    try {
-                        String txt = getFileContent(filePath);
-                        parseFileContent(txt);
-                    } catch (Exception ignored) {
-                    }
+                try {
+                    String txt = getFileContent(filePath);
+                    parseFileContent(txt);
+                } catch (Exception ignored) {
                 }
             }
         }
         cleanClassImportedData(classImportedData);
         deleteReplicateString(annotationsData, keywordsData);
-        outputToConsoleAndLocal();
+        outputToConsoleAndLocal(sb);
+
+        String endInfo = "============================================= SCANNING END ===================================================";
+        outputAndAppend(sb, endInfo);
+
+        writeToLocalFile(sb);
     }
 
-    private static void outputToConsoleAndLocal() {
-        StringBuilder sb = new StringBuilder();
+    private static void outputAndAppend(StringBuilder sb, String info) {
+        System.out.println(info);
+        sb.append(info).append(Constants.NEWLINE);
+    }
 
-        String classesIllustration = "-------------------- Classes Used Statistics ----------------------";
+
+    private static void writeToLocalFile(StringBuilder sb) {
+        File localFile = new File("statistics.txt");
+        try {
+            try (OutputStream output = new FileOutputStream(localFile)) {
+                byte[] bytes = sb.toString().getBytes();
+                output.write(bytes);
+            }
+        } catch (IOException e) {
+            System.out.println("------------------------------ warning: output statistics to local file failed -------------------------------");
+        }
+    }
+
+    private static void outputToConsoleAndLocal(StringBuilder sb) {
+
+        String classesIllustration = "------------------------------------------- Classes Used Statistics ------------------------------------------";
         System.out.println(classesIllustration);
         sb.append(classesIllustration).append(Constants.NEWLINE);
 
-        String classesStatistics = "Totally " + keywordsData.size() + " classes imported";
+        String classesStatistics = "Totally " + classImportedData.size() + " classes imported";
         System.out.println(classesStatistics);
         sb.append(classesStatistics).append(Constants.NEWLINE);
 
@@ -59,7 +94,7 @@ public class App {
         sb.append(Constants.NEWLINE);
 
 
-        String annotationIllustration = "-------------------- Annotations Used Statistics --------------------";
+        String annotationIllustration = "----------------------------------------- Annotations Used Statistics ----------------------------------------";
         System.out.println(annotationIllustration);
         sb.append(annotationIllustration).append(Constants.NEWLINE);
 
@@ -71,7 +106,7 @@ public class App {
         sb.append(Constants.NEWLINE);
 
 
-        String keywordsIllustration = "-------------------- Keywords Used Statistics ----------------------";
+        String keywordsIllustration = "------------------------------------------ Keywords Used Statistics ------------------------------------------";
         System.out.println(keywordsIllustration);
         sb.append(keywordsIllustration).append(Constants.NEWLINE);
 
@@ -81,17 +116,6 @@ public class App {
 
         showStatisticsData(keywordsData, sb, 50);
         sb.append(Constants.NEWLINE);
-
-
-        File localFile = new File("statistics.txt");
-        try {
-            try (OutputStream output = new FileOutputStream(localFile)) {
-                byte[] bytes = sb.toString().getBytes();
-                output.write(bytes);
-            }
-        } catch (IOException e) {
-            System.out.println("================== warning: output statistics to local file failed ========================");
-        }
     }
 
     private static void deleteReplicateString(Map<String, Integer> annotations, Map<String, Integer> classes) {
@@ -107,12 +131,12 @@ public class App {
 
         List<String> singleWord = new ArrayList<>();
         Set<String> keys = keywordsData.keySet();
-        for (String key: keys) {
+        for (String key : keys) {
             if (key != null && key.length() == 1) {
                 singleWord.add(key);
             }
         }
-        for (String single: singleWord) {
+        for (String single : singleWord) {
             keywordsData.remove(single);
         }
     }
@@ -146,10 +170,10 @@ public class App {
         findKeyword(txt, keywordsRegex, keywordsData);
     }
 
-    private static void cleanClassImportedData(HashMap<String,Integer> classImportedData) {
+    private static void cleanClassImportedData(HashMap<String, Integer> classImportedData) {
         Map<String, Integer> afterClean = new HashMap<>();
         Set<String> keys = classImportedData.keySet();
-        for(String key: keys) {
+        for (String key : keys) {
             if (key != null && key.startsWith(Constants.IMPORT) && key.endsWith(Constants.COLON)) {
                 String temp = key.replace(Constants.IMPORT, Constants.EMPTY);
                 temp = temp.replace(Constants.COLON, Constants.EMPTY);

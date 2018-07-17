@@ -1,6 +1,10 @@
 ## project_scanner
 A project for finding used classes and annotations in local directory.
 
+## required
+- jdk 1.8+
+- maven 3.0+
+
 ## how to start
 - make sure you have install java&maven environment
 - download this project from github
