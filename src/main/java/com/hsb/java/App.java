@@ -23,7 +23,8 @@ public class App {
     private static HashMap<String, Integer> classImportedData = new HashMap<>();
 
     public static void main(String[] args) {
-        String path = args[0];
+//        String path = "D:/develop/github/spring-boot-examples";
+         String path = args[0];
         System.out.println("Begin to scan the path ：" + path);
 
         List<String> files = new ArrayList<>(getAllFilesPath(path));
@@ -102,6 +103,17 @@ public class App {
                     classes.remove(annotation);
                 }
             }
+        }
+
+        List<String> singleWord = new ArrayList<>();
+        Set<String> keys = keywordsData.keySet();
+        for (String key: keys) {
+            if (key != null && key.length() == 1) {
+                singleWord.add(key);
+            }
+        }
+        for (String single: singleWord) {
+            keywordsData.remove(single);
         }
     }
 
