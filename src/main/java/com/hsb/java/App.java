@@ -1,14 +1,19 @@
 package com.hsb.java;
 
+import com.hsb.java.constants.Constants;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,53 +22,94 @@ public class App {
     private static HashMap<String, Integer> annotationsData = new HashMap<>();
 
     public static void main(String[] args) {
-        String path = "D:/develop/github/spring-boot-examples";
+        String path = args[0];
+        System.out.println("开始扫描地址：" + path + " 路径下使用的Java类和注解");
 
         List<String> files = new ArrayList<>(getAllFilesPath(path));
         if (files.size() > 0) {
             for (String filePath : files) {
-                if (filePath != null && (filePath.endsWith(".java")||filePath.endsWith(".xml"))) {
+                if (filePath != null && (filePath.endsWith(".java") || filePath.endsWith(".xml"))) {
                     try {
                         String txt = getFileContent(filePath);
-                        if (txt.contains("@Test")) {
-                            System.out.println(filePath);
-                        }
                         parseFileContent(txt);
                     } catch (Exception ignored) {
                     }
                 }
             }
         }
-        System.out.println("--------------------注解使用统计--------------------");
-        System.out.println("共计使用注解" + annotationsData.size() + "个");
-        showStatisticsData(annotationsData);
-        System.out.println("--------------------类使用统计----------------------");
-        System.out.println("共计使用类" + classesData.size() + "个");
-        showStatisticsData(classesData);
+        deleteReplicateString(annotationsData, classesData);
+        outputToConsoleAndLocal();
     }
 
-    private static void showStatisticsData(HashMap<String, Integer> data) {
+    private static void outputToConsoleAndLocal() {
+        StringBuilder sb = new StringBuilder();
+        String annotationIllustration = "--------------------注解使用统计--------------------";
+        System.out.println(annotationIllustration);
+        sb.append(annotationIllustration).append(Constants.NEWLINE);
+
+        String annotationStatistics = "共计使用注解 " + annotationsData.size() + " 个";
+        System.out.println(annotationStatistics);
+        sb.append(annotationStatistics).append(Constants.NEWLINE);
+
+        showStatisticsData(annotationsData, sb);
+
+        String classesIllustration = "--------------------关键字使用统计----------------------";
+        System.out.println(classesIllustration);
+        sb.append(classesIllustration).append(Constants.NEWLINE);
+
+        String classStatistics = "共计出现可能的类 " + classesData.size() + " 个";
+        System.out.println(classStatistics);
+        sb.append(classStatistics).append(Constants.NEWLINE);
+
+        showStatisticsData(classesData, sb);
+
+        File localFile = new File("statistics.txt");
+        try {
+            try (OutputStream output = new FileOutputStream(localFile)) {
+                byte[] bytes = sb.toString().getBytes();
+                output.write(bytes);
+            }
+        } catch (IOException e) {
+            System.out.println("================== warning: output statistics to local file failed ========================");
+        }
+    }
+
+    private static void deleteReplicateString(Map<String, Integer> annotations, Map<String, Integer> classes) {
+        if (annotations != null && classes != null) {
+            Set<String> keySet = annotations.keySet();
+            for (String annotation : keySet) {
+                if (annotation != null && annotation.startsWith(Constants.AT)) {
+                    annotation = annotation.replace(Constants.AT, Constants.EMPTY);
+                    classes.remove(annotation);
+                }
+            }
+        }
+    }
+
+    private static void showStatisticsData(HashMap<String, Integer> data, StringBuilder sb) {
         List<Map.Entry<String, Integer>> annotationLists = new ArrayList<>(data.entrySet());
         annotationLists.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
         for (Map.Entry<String, Integer> entry : annotationLists) {
-            System.out.println(fillWithBlank(entry.getKey(), entry.getValue()));
+            String output = fillWithBlank(entry.getKey(), entry.getValue());
+            System.out.println(output);
+            sb.append(output).append(Constants.NEWLINE);
         }
     }
 
     private static String fillWithBlank(String key, Integer value) {
         StringBuilder sb = new StringBuilder(key);
-        int blanks = 100 - sb.length();
+        int blanks = 50 - sb.length();
         for (int i = 0; i < blanks; i++) {
             sb.append(" ");
         }
         sb.append(value);
-        return sb.toString().replace("import ", "").replace(";", "");
+        return sb.toString().replace("import ", Constants.EMPTY).replace(";", Constants.EMPTY);
     }
 
     private static void parseFileContent(String txt) {
-        String annotationRegex = "@[A-Z](\\w*)";
+        String annotationRegex = "@[A-Z][A-Za-z0-9]*";
         findKeyword(txt, annotationRegex, annotationsData);
-        String classRegex = "(import )[A-Za-z0-9_.]*\\;";
+        String classRegex = "[A-Z][A-Za-z0-9]*";
         findKeyword(txt, classRegex, classesData);
     }
 
@@ -71,17 +117,15 @@ public class App {
         Pattern pattern = Pattern.compile(regex);
         if (txt != null && txt.length() > 0) {
             Matcher matcher = pattern.matcher(txt);
-            if (matcher.find()) {
-                if (matcher.groupCount() > 0) {
-                    for (int i = 0; i < matcher.groupCount(); i++) {
-                        String temp = matcher.group(i);
-                        if (map.containsKey(temp)) {
-                            map.put(temp, map.get(temp) + 1);
-                        } else {
-                            if (temp.length() > 1) {
-                                map.put(temp, 1);
-                            }
-                        }
+            while (matcher.find()) {
+                int beforeStart = matcher.start() - 1;
+                if (beforeStart >= 0 && !Constants.AT.equals(String.valueOf(txt.charAt(beforeStart)))) {
+                    String temp = matcher.group();
+                    if (map.containsKey(temp)) {
+                        int count = map.get(temp);
+                        map.put(temp, count + 1);
+                    } else {
+                        map.put(temp, 1);
                     }
                 }
             }
@@ -98,7 +142,7 @@ public class App {
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
                     fileContent.append(line);
-                    fileContent.append("\r\n");
+                    fileContent.append(Constants.NEWLINE);
                 }
             } finally {
                 bufferedReader.close();
